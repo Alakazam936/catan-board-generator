@@ -245,46 +245,73 @@ class CatanBoardGenerator:
     
     def display_board_visual(self, board: List[Dict]):
         """Display a visual hex grid representation"""
-        print("\n" + "="*70)
+        print("\n" + "="*80)
         print("CATAN BOARD - VISUAL LAYOUT")
-        print("="*70 + "\n")
+        print("="*80 + "\n")
         
         # Rows configuration for standard board: 3-4-5-4-3
         rows = [
-            (board[0:3], 6),    # 3 hexes, offset 6
-            (board[3:7], 3),    # 4 hexes, offset 3
-            (board[7:12], 0),   # 5 hexes, offset 0
-            (board[12:16], 3),  # 4 hexes, offset 3
-            (board[16:19], 6)   # 3 hexes, offset 6
+            (board[0:3], 18),    # 3 hexes, offset 18
+            (board[3:7], 12),    # 4 hexes, offset 12
+            (board[7:12], 6),    # 5 hexes, offset 6
+            (board[12:16], 12),  # 4 hexes, offset 12
+            (board[16:19], 18)   # 3 hexes, offset 18
         ]
         
-        for row_hexes, offset in rows:
+        for row_num, (row_hexes, offset) in enumerate(rows):
             # Print hex tops
             print(" " * offset, end="")
-            for _ in row_hexes:
-                print("  ____    ", end="")
+            for i, _ in enumerate(row_hexes):
+                if i > 0:
+                    print("  ____  ", end="")
+                else:
+                    print(" ____  ", end="")
             print()
             
-            # Print hex middle with terrain
+            # Print hex upper middle with terrain
             print(" " * offset, end="")
-            for hex_tile in row_hexes:
+            for i, hex_tile in enumerate(row_hexes):
                 terrain_short = hex_tile['terrain'][:4].upper()
-                print(f" /{terrain_short:4s}\\   ", end="")
+                if i > 0:
+                    print(f" /{terrain_short:4s}\\ ", end="")
+                else:
+                    print(f"/{terrain_short:4s}\\ ", end="")
             print()
             
-            # Print hex middle with number
+            # Print hex center with number
             print(" " * offset, end="")
-            for hex_tile in row_hexes:
+            for i, hex_tile in enumerate(row_hexes):
                 number_str = str(hex_tile['number']) if hex_tile['number'] else "--"
                 pips = self.get_pip_count(hex_tile['number'])
-                print(f" | {number_str:2s}:{pips} |   ", end="")
+                if i > 0:
+                    print(f" |{number_str:2s}:{pips}| ", end="")
+                else:
+                    print(f"|{number_str:2s}:{pips}| ", end="")
             print()
             
             # Print hex bottoms
             print(" " * offset, end="")
-            for _ in row_hexes:
-                print(" \\____/   ", end="")
-            print("\n")
+            for i, _ in enumerate(row_hexes):
+                if i > 0:
+                    print(f" \\____/ ", end="")
+                else:
+                    print(f"\\____/ ", end="")
+            print()
+            
+            # Add interlocking line between rows (except last row)
+            if row_num < len(rows) - 1:
+                next_offset = rows[row_num + 1][1]
+                print(" " * (next_offset - 1), end="")
+                # Create the interlocking effect
+                num_connections = len(rows[row_num + 1][0])
+                for i in range(num_connections):
+                    if i == 0:
+                        print(" /", end="")
+                    else:
+                        print("      /", end="")
+                print()
+        
+        print()
     
     def display_board(self, board: List[Dict]):
         """Display the board in a readable format"""
@@ -414,7 +441,6 @@ def main():
                 generator.display_board(board)
         else:
             print("\nThanks for using the Catan Board Generator!")
-            print("Perfect for your GitHub portfolio! 🎲")
             break
 
 if __name__ == "__main__":
